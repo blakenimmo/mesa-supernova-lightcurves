@@ -1,0 +1,9 @@
+# MESA / STELLA raw outputs (too large for GitHub)
+*.mod
+LOGS*/
+photos*/
+png*/
+*.o
+star
+.mesa_temp_cache/
+.DS_Store
