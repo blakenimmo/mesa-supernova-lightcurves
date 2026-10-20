@@ -129,7 +129,7 @@ Simulate a 12 M☉ star up to the point just before collapse, in the same way as
 ### Method
 Used the preset folder 12M_pre_ms_to_core_collapse from MESA's test suite, run with ./clean, ./mk, ./rn as for the 20 M☉ star. Final model saved as final.mod.
 Metallicity Z = 0.0142 (confirmed from the explosion run).
-Helium and wind settings in this folder's inlist_mass_Z_wind_rotation, to confirm they match the 20 M☉ run (Y = 0.2703, Dutch_scaling_factor = 0).
+Helium and wind settings in this folder's inlist_mass_Z_wind_rotation match the 20 M☉ run (Y = 0.2703, Dutch_scaling_factor = 0).
 
 ### Results
 The simulation completed, but took considerably longer than the 20 M☉ run.
@@ -478,7 +478,6 @@ python plot_lightcurve.py 12 16 20 22   # mass comparison
 ### Results
 Plotted 22 M☉ light curve and comparison of all current masses.
 - Breakout spike at day 0, then a plateau at the same brightness as the other masses.
-- Plateau length increases with mass, approximate day at which log L drops below 42.0.
 - This is the expected trend as a more massive star keeps a larger hydrogen envelope, which takes longer to recombine, so the plateau lasts longer.
 
 ![22 Msun light curve](plots/lightcurve_22M.png)
@@ -487,3 +486,76 @@ Plotted 22 M☉ light curve and comparison of all current masses.
 
 ### Next steps
 Simulate the 14 M☉ and 18 M☉ stars in the same way to complete the mass series.
+
+---
+
+## 19/10: 14 M☉ and 18 M☉ stars complete
+
+### Aim
+Run the last two stars of the mass series (14 M☉ and 18 M☉) all the way to light curves, then plot the full mass comparison and redo the metallicity comparison in the same style.
+
+### What we did
+**14 M☉: pre-collapse (overnight 18/10 - 19/10)**
+- Copied the original 20M_pre_ms_to_core_collapse folder to 14M_pre_ms_to_core_collapse (Z = 0.0142, Y = 0.2703, winds off, the same as the other masses) and changed only the mass:
+
+```
+sed -i '' 's/initial_mass = 20/initial_mass = 14/' inlist_mass_Z_wind_rotation
+```
+
+- Successful, no issues. Run time: about 2 h 55 min (00:44 → 03:37), longer than the heavier stars because lower-mass stars live longer and need more timesteps.
+
+**14 M☉: explosion**
+- Explosion folder ccsn_IIp_14M copied from ccsn_IIp_20M_2Z, with final.mod copied in as pre_ccsn.mod.
+- Successful, Explosion run time ~1 h 40 mins.
+- STELLA light curve calculated and saved in res_14M.
+
+**18 M☉: pre-collapse**
+- Same method, initial_mass = 18. Successful, no issues. Run time: ~2 h 20 min
+
+**18 M☉: explosion**
+- Explosion folder ccsn_IIp_18M copied from ccsn_IIp_14M
+- Part 5 finished cleanly at 01:29 (20/10), the model is handed to STELLA.
+- STELLA light curve calculated and saved in res_18M.
+
+**Why the timesteps shrink near the surface (for the write-up)**
+As the shock approaches the surface, the outer cells become very thin, the surface luminosity is about to jump by orders of magnitude, and the outer layers stop being optically thick. MESA's timestep limits (sound-crossing time of the smallest cell, and a 0.01 dex limit on luminosity change per step) force tiny steps, and the solver repeatedly fails (e.g. "get_T_tau -- L <= 0") because MESA treats radiation as diffusion, which breaks down near breakout. This is why the model is handed to STELLA just before breakout. The heavier, more extended envelopes reach this region before the standard 0.05 M☉ target.
+
+**New plots**
+Wrote two new plotting scripts in the style of the light-curve figures in the example paper: the y-axis now includes the shock-breakout spike, an inset zooms in on the first 3 days, a dashed line marks day 50, and the colours run light to dark with increasing mass or metallicity (green - purple for mass, amber - dark red for metallicity). Each has a cropped version (main figure) and a full-range version.
+
+```
+python plot_mass_comparison.py           # main figure
+python plot_mass_comparison.py --full    # full range
+python plot_metallicity_comparison.py
+python plot_metallicity_comparison.py --full
+```
+
+### Results
+The mass series is now complete: 12, 14, 16, 18, 20 and 22 M☉ at Z = 0.0142.
+
+![Mass comparison, full range](plots/lightcurve_mass_comparison_12M_14M_16M_18M_20M_22M_full.png)
+
+- All six plateaus have the same brightness (log L ≈ 42.4–42.5 at day 50).
+- Plateau length increases steadily with mass. Day at which log L drops below 42.0, measured from the data:
+
+| Mass | Plateau ends (log L < 42.0) |
+|---|---|
+| 12 M☉ | day 91.6 |
+| 14 M☉ | day 99.8 |
+| 16 M☉ | day 108.5 |
+| 18 M☉ | day 115.5 |
+| 20 M☉ | day 130.3 |
+| 22 M☉ | day 134.2 |
+
+- The step from 20 to 22 M☉ (about 4 days) is still much smaller than the others (8–15 days).
+- In the inset, the heavier stars have slightly brighter early cooling. The 22 M☉ spike is the tallest, probably linked to its earlier handoff to STELLA.
+- The steps in the 12–18 M☉ tails (days ~120, 140, 149) are numerical artefacts at very low luminosity. Tails are not physical (no ⁵⁶Ni).
+
+![Metallicity comparison, full range](plots/lightcurve_metallicity_comparison_20M_full.png)
+
+- Plateaus nearly overlap; higher Z is very slightly brighter (about 0.05 dex) and all end around day 130.
+- The drop after the plateau is steeper for higher Z.
+- The tallest breakout spike (Z = 0.021) is most likely from its earlier handoff to STELLA, not metallicity.
+
+### Next steps
+Inject explosion energy into collapse of what will likely be the 20 M☉ model.
