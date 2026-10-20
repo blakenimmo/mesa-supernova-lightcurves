@@ -484,6 +484,24 @@ Plotted 22 M☉ light curve and comparison of all current masses.
 
 ![Mass comparison: 12, 16, 20, 22 Msun](plots/lightcurve_12M_vs_16M_vs_20M_vs_22M.png)
 
+## Results
+
+Plateau length measured as the time after peak until log L_bol drops 0.5 dex below its plateau level (median over days 20–60).
+
+| Run | Plateau log L_bol (erg/s) | Plateau length (days) |
+|---|---|---|
+| 12M | 42.42 | 93 |
+| 16M | 42.44 | 109 |
+| 20M | 42.40 | 132 |
+| 22M | 42.38 | 136 |
+| 20M_1.5Z | 42.43 | 132 |
+| 20M_2Z | 42.48 | 131 |
+
+- **Mass:** the plateau lengthens from ~93 to ~136 days between 12 and 22 M☉, as a more massive hydrogen envelope takes longer to recombine, while plateau luminosity stays almost constant (~10^42.4 erg/s).
+- **Metallicity:** at 20 M☉, doubling Z barely changes plateau length (131–132 days) and raises the luminosity only slightly, so in these models initial mass dominates.
+
+![Metallicity comparison](plots/lightcurve_20M_vs_20M_1.5Z_vs_20M_2Z.png)
+
 ### Next steps
 Simulate the 14 M☉ and 18 M☉ stars in the same way to complete the mass series.
 
